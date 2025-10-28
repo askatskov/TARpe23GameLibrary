@@ -1,18 +1,12 @@
 {
   "name": "tarpe23gamelibrary",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "1.0.0",
+  "description": "**GameLibrary** \r on Node.js põhine veebirakendus, mis võimaldab kasutajatel sirvida erinevaid videomänge, vaadata nende kirjeldusi ja hinnanguid ning osta mänge otse rakenduse kaudu.  \r Projekt kasutab andmebaasi, kuhu on salvestatud mängude info (nimi, žanr, kirjeldus, hind, hinnang jne).",
+  "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {
-    "vue": "^3.5.22"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.1",
-    "vite": "^7.1.7"
-  }
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
