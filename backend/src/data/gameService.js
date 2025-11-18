@@ -2,14 +2,14 @@ import Games from "./GameModel.js";
 
 export const gameService = {
 
-  async getGame(gameId) {
+  async getGame(id) {
     try {
-      const game = await Games.findByPk(gameId, {
+      const game = await Games.findByPk(id, {
         attributes: { exclude: ["createdAt", "updatedAt"] },
       });
       return game ? game.get({ plain: true }) : null;
-    } catch (error) {
-      console.error("❌ Error fetching game by ID:", error);
+    } catch (err) {
+      console.error("❌ Error fetching game:", err);
       throw new Error("Failed to fetch game.");
     }
   },
@@ -17,81 +17,105 @@ export const gameService = {
   async getGames() {
     try {
       const games = await Games.findAll({
-        attributes: ["id", "name", "developer", "price"],
-        order: [["id", "ASC"]],
+        attributes: [
+          "id",
+          "name",
+          "developer",
+          "genre",
+          "price",
+          "rating",
+          "imageUrl",
+        ],
+        order: [["rating", "DESC"]],
       });
-      return games.map((g) => g.get({ plain: true }));
-    } catch (error) {
-      console.error("❌ Error fetching games:", error);
-      throw new Error("Failed to fetch games.");
+
+      return games.map(g => g.get({ plain: true }));
+    } catch (err) {
+      console.error("❌ Error fetching games:", err);
+      throw new Error("Failed to load games.");
     }
   },
 
-  async createGame(name, developer, releaseDate, price) {
+  async createGame(data) {
     try {
-      if (!name || name.trim().length < 2) {
-        throw new Error("Game name must be at least 2 characters long.");
+      if (!data.name || data.name.length < 2) {
+        throw new Error("Name must be at least 2 characters.");
       }
 
-      if (price && (isNaN(price) || parseFloat(price) < 0)) {
-        throw new Error("Price must be a valid positive number.");
-      }
+      const existing = await Games.findOne({ where: { name: data.name } });
+      if (existing) throw new Error("Game already exists.");
 
-      const existingGame = await Games.findOne({ where: { name } });
-      if (existingGame) {
-        throw new Error(`Game '${name}' already exists.`);
-      }
+      const created = await Games.create(data);
+      return created.get({ plain: true });
 
-      const createdGame = await Games.create({
-        name,
-        developer,
-        releaseDate,
-        price,
-      });
-
-      console.log(`✅ Game '${name}' created successfully.`);
-      return createdGame.get({ plain: true });
-    } catch (error) {
-      console.error("❌ Error creating game:", error.message);
-      throw new Error(error.message || "Failed to create game.");
+    } catch (err) {
+      console.error("❌ Error creating game:", err);
+      throw new Error(err.message);
     }
   },
 
-  async updateGame(gameId, updatedFields) {
+  async updateGame(id, fields) {
     try {
-      const game = await Games.findByPk(gameId);
-      if (!game) {
-        throw new Error(`Game with ID ${gameId} not found.`);
-      }
+      const game = await Games.findByPk(id);
+      if (!game) throw new Error("Game not found.");
 
-      if (updatedFields.price && parseFloat(updatedFields.price) < 0) {
-        throw new Error("Price cannot be negative.");
-      }
-
-      await game.update(updatedFields);
-      console.log(`🔄 Game '${game.name}' updated successfully.`);
+      await game.update(fields);
       return game.get({ plain: true });
-    } catch (error) {
-      console.error("❌ Error updating game:", error);
+
+    } catch (err) {
+      console.error("❌ Error updating:", err);
       throw new Error("Failed to update game.");
     }
   },
 
-  async deleteGame(gameId) {
+  async deleteGame(id) {
     try {
-      const deleteResult = await Games.destroy({
-        where: { id: gameId },
-      });
-
-      if (deleteResult === 0) {
-        throw new Error(`Game with ID ${gameId} not found.`);
-      }
-
-      console.log(`🗑️ Game with ID ${gameId} deleted successfully.`);
+      const result = await Games.destroy({ where: { id } });
+      if (!result) throw new Error("Game not found.");
       return true;
-    } catch (error) {
-      console.error("❌ Error deleting game:", error);
+
+    } catch (err) {
+      console.error("❌ Error deleting:", err);
       throw new Error("Failed to delete game.");
     }
   },
+
+  async getFeaturedGames(limit = 5) {
+    const games = await Games.findAll({
+      order: [["rating", "DESC"]],
+      limit,
+    });
+    return games.map(g => g.get({ plain: true }));
+  },
+
+  async getPriceHistory(id) {
+    const game = await Games.findByPk(id);
+    if (!game) return null;
+    return game.priceHistory || [];
+  },
+
+  async getReviews(id) {
+    const game = await Games.findByPk(id);
+    if (!game) return null;
+    return game.reviews || [];
+  },
+
+  async addReview(id, { username, rating, comment }) {
+    const game = await Games.findByPk(id);
+    if (!game) throw new Error("Game not found");
+
+    const reviews = Array.isArray(game.reviews) ? [...game.reviews] : [];
+    const newReview = {
+      username: username || "Anonüümne",
+      rating: Number(rating),
+      comment: comment || "",
+      createdAt: new Date().toISOString(),
+    };
+
+    reviews.push(newReview);
+    game.reviews = reviews;
+    await game.save();
+
+    return newReview;
+  }
 };
