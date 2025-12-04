@@ -1,8 +1,6 @@
-// backend/src/controllers/gameController.js
 import { gameService } from "../data/gameService.js";
 
 export const gameController = {
-  // GET /api/v1/games
   async getAllGames(req, res) {
     try {
       const games = await gameService.getGames();
@@ -13,7 +11,6 @@ export const gameController = {
     }
   },
 
-  // GET /api/v1/games/:id
   async getGameById(req, res) {
     const { id } = req.params;
 
@@ -33,7 +30,6 @@ export const gameController = {
     }
   },
 
-  // POST /api/v1/games
   async createGame(req, res) {
     const { name, developer, releaseDate: releaseDateStr, price: priceStr } = req.body;
 
@@ -60,12 +56,12 @@ export const gameController = {
     }
 
     try {
-      const game = await gameService.createGame(
+      const game = await gameService.createGame({
         name,
         developer,
         releaseDate,
-        price
-      );
+        price,
+      });
       return res.status(201).json(game);
     } catch (error) {
       console.error("❌ Error in createGame:", error);
@@ -73,7 +69,6 @@ export const gameController = {
     }
   },
 
-  // PUT /api/v1/games/:id
   async updateGame(req, res) {
     const { id } = req.params;
 
@@ -119,7 +114,6 @@ export const gameController = {
     }
   },
 
-  // DELETE /api/v1/games/:id
   async deleteGame(req, res) {
     const { id } = req.params;
 
