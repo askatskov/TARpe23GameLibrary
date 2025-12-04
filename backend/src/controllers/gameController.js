@@ -65,6 +65,11 @@ export const gameController = {
       return res.status(201).json(game);
     } catch (error) {
       console.error("❌ Error in createGame:", error);
+
+      if (error.message === "Game already exists.") {
+        return res.status(409).send({ error: error.message });
+      }
+
       return res.status(400).send({ error: error.message });
     }
   },
@@ -122,13 +127,15 @@ export const gameController = {
     }
 
     try {
-      const deleted = await gameService.deleteGame(id);
-      if (!deleted) {
-        return res.status(404).send({ error: "Game not found" });
-      }
+      await gameService.deleteGame(id);
       return res.status(204).send();
     } catch (error) {
       console.error("❌ Error in deleteGame:", error);
+
+      if (error.message === "Game not found.") {
+        return res.status(404).send({ error: error.message });
+      }
+
       return res.status(400).send({ error: error.message });
     }
   },
