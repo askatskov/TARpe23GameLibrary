@@ -37,39 +37,48 @@ export const gameService = {
   },
 
   async createGame(data) {
-    if (!data.name || data.name.length < 2) {
-      throw new Error("Name must be at least 2 characters.");
-    }
+    try {
+      if (!data.name || data.name.length < 2) {
+        throw new Error("Name must be at least 2 characters.");
+      }
 
-    const existing = await Games.findOne({ where: { name: data.name } });
-    if (existing) {
-      throw new Error("Game already exists.");
-    }
+      const existing = await Games.findOne({ where: { name: data.name } });
+      if (existing) throw new Error("Game already exists.");
 
-    const created = await Games.create(data);
-    return created.get({ plain: true });
+      const created = await Games.create(data);
+      return created.get({ plain: true });
+
+    } catch (err) {
+      console.error("❌ Error creating game:", err);
+      throw new Error(err.message);
+    }
   },
-
 
   async updateGame(id, fields) {
-    const game = await Games.findByPk(id);
-    if (!game) {
-      throw new Error("Game not found.");
+    try {
+      const game = await Games.findByPk(id);
+      if (!game) throw new Error("Game not found.");
+
+      await game.update(fields);
+      return game.get({ plain: true });
+
+    } catch (err) {
+      console.error("❌ Error updating:", err);
+      throw new Error("Failed to update game.");
     }
-
-    await game.update(fields);
-    return game.get({ plain: true });
   },
-
 
   async deleteGame(id) {
-    const result = await Games.destroy({ where: { id } });
-    if (!result) {
-      throw new Error("Game not found.");
-    }
-    return true;
-  },
+    try {
+      const result = await Games.destroy({ where: { id } });
+      if (!result) throw new Error("Game not found.");
+      return true;
 
+    } catch (err) {
+      console.error("❌ Error deleting:", err);
+      throw new Error("Failed to delete game.");
+    }
+  },
 
   async getFeaturedGames(limit = 5) {
     const games = await Games.findAll({

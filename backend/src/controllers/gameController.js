@@ -30,73 +30,70 @@ export const gameController = {
     }
   },
 
-  async createGame(req, res) {
-    const {
+async createGame(req, res) {
+  const {
+    name,
+    developer,
+    genre,
+    imageUrl,
+    rating,
+    releaseDate: releaseDateStr,
+    price: priceStr
+  } = req.body;
+
+  if (!name) {
+    return res
+      .status(400)
+      .send({ error: "Missing or empty required field: name" });
+  }
+
+  if (!genre) {
+    return res
+      .status(400)
+      .send({ error: "Missing or empty required field: genre" });
+  }
+
+  if (!imageUrl) {
+    return res
+      .status(400)
+      .send({ error: "Missing or empty required field: imageUrl" });
+  }
+
+  const releaseDate = releaseDateStr ? Date.parse(releaseDateStr) : undefined;
+  if (releaseDateStr && isNaN(releaseDate)) {
+    return res
+      .status(400)
+      .send({ error: "Empty or malformed date string in field: releaseDate" });
+  }
+
+  const price =
+    priceStr !== undefined && priceStr !== null && priceStr !== ""
+      ? parseFloat(priceStr)
+      : undefined;
+
+  if (priceStr && isNaN(price)) {
+    return res
+      .status(400)
+      .send({ error: "Malformed number string in field: price" });
+  }
+
+  try {
+    const game = await gameService.createGame({
       name,
       developer,
       genre,
-      description,
-      releaseDate: releaseDateStr,
-      price: priceStr,
-      rating,
       imageUrl,
-    } = req.body;
+      rating,
+      releaseDate,
+      price
+    });
 
-
-    if (!name) {
-      return res.status(400).send({ error: "Missing or empty required field: name" });
-    }
-
-    let releaseDate;
-    if (releaseDateStr) {
-      const timestamp = Date.parse(releaseDateStr);
-      if (Number.isNaN(timestamp)) {
-        return res
-          .status(400)
-          .send({ error: "Empty or malformed date string in field: releaseDate" });
-      }
-      releaseDate = new Date(timestamp);
-    }
-
-    let price;
-    if (priceStr !== undefined && priceStr !== null && priceStr !== "") {
-      const parsedPrice = parseFloat(priceStr);
-      if (Number.isNaN(parsedPrice)) {
-        return res
-          .status(400)
-          .send({ error: "Malformed number string in field: price" });
-      }
-      price = parsedPrice;
-    }
-
-    if (priceStr && isNaN(price)) {
-      return res
-        .status(400)
-        .send({ error: "Malformed number string in field: price" });
-    }
-
-    try {
-      const game = await gameService.createGame({
-        name,
-        developer,
-        genre,
-        description,
-        releaseDate,
-        price,
-        rating,
-        imageUrl,
-      });
-      return res.status(201).json(game);
-    } catch (error) {
-      console.error("❌ Error in createGame:", error);
-
-      if (error.message === "Game already exists.") {
-        return res.status(409).send({ error: error.message });
-      }
-
-      return res.status(400).send({ error: error.message });
-    }
-  },
+    return res.status(201).json(game);
+  } catch (error) {
+    console.error("❌ Error in createGame:", error);
+    return res.status(400).send({ error: error.message });
+  }
+},
 
   async updateGame(req, res) {
     const { id } = req.params;
@@ -105,16 +102,7 @@ export const gameController = {
       return res.status(400).send({ error: "URL does not contain ID" });
     }
 
-    const {
-      name,
-      developer,
-      genre,
-      description,
-      releaseDate: releaseDateStr,
-      price: priceStr,
-      rating,
-      imageUrl,
-    } = req.body;
+    const { name, developer, releaseDate: releaseDateStr, price: priceStr } = req.body;
 
     const releaseDate = releaseDateStr ? Date.parse(releaseDateStr) : undefined;
     if (releaseDateStr && isNaN(releaseDate)) {
@@ -138,12 +126,8 @@ export const gameController = {
       const updatedGame = await gameService.updateGame(id, {
         name,
         developer,
-        genre,
-        description,
         releaseDate,
         price,
-        rating,
-        imageUrl,
       });
 
       return res.status(200).json(updatedGame);
@@ -164,15 +148,13 @@ export const gameController = {
     }
 
     try {
-      await gameService.deleteGame(id);
+      const deleted = await gameService.deleteGame(id);
+      if (!deleted) {
+        return res.status(404).send({ error: "Game not found" });
+      }
       return res.status(204).send();
     } catch (error) {
       console.error("❌ Error in deleteGame:", error);
-
-      if (error.message === "Game not found.") {
-        return res.status(404).send({ error: error.message });
-      }
-
       return res.status(400).send({ error: error.message });
     }
   },
