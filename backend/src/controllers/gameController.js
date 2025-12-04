@@ -31,23 +31,43 @@ export const gameController = {
   },
 
   async createGame(req, res) {
-    const { name, developer, releaseDate: releaseDateStr, price: priceStr } = req.body;
+    const {
+      name,
+      developer,
+      genre,
+      description,
+      releaseDate: releaseDateStr,
+      price: priceStr,
+      rating,
+      imageUrl,
+    } = req.body;
+
 
     if (!name) {
       return res.status(400).send({ error: "Missing or empty required field: name" });
     }
 
-    const releaseDate = releaseDateStr ? Date.parse(releaseDateStr) : undefined;
-    if (releaseDateStr && isNaN(releaseDate)) {
-      return res
-        .status(400)
-        .send({ error: "Empty or malformed date string in field: releaseDate" });
+    let releaseDate;
+    if (releaseDateStr) {
+      const timestamp = Date.parse(releaseDateStr);
+      if (Number.isNaN(timestamp)) {
+        return res
+          .status(400)
+          .send({ error: "Empty or malformed date string in field: releaseDate" });
+      }
+      releaseDate = new Date(timestamp);
     }
 
-    const price =
-      priceStr !== undefined && priceStr !== null && priceStr !== ""
-        ? parseFloat(priceStr)
-        : undefined;
+    let price;
+    if (priceStr !== undefined && priceStr !== null && priceStr !== "") {
+      const parsedPrice = parseFloat(priceStr);
+      if (Number.isNaN(parsedPrice)) {
+        return res
+          .status(400)
+          .send({ error: "Malformed number string in field: price" });
+      }
+      price = parsedPrice;
+    }
 
     if (priceStr && isNaN(price)) {
       return res
@@ -59,8 +79,12 @@ export const gameController = {
       const game = await gameService.createGame({
         name,
         developer,
+        genre,
+        description,
         releaseDate,
         price,
+        rating,
+        imageUrl,
       });
       return res.status(201).json(game);
     } catch (error) {
@@ -81,7 +105,16 @@ export const gameController = {
       return res.status(400).send({ error: "URL does not contain ID" });
     }
 
-    const { name, developer, releaseDate: releaseDateStr, price: priceStr } = req.body;
+    const {
+      name,
+      developer,
+      genre,
+      description,
+      releaseDate: releaseDateStr,
+      price: priceStr,
+      rating,
+      imageUrl,
+    } = req.body;
 
     const releaseDate = releaseDateStr ? Date.parse(releaseDateStr) : undefined;
     if (releaseDateStr && isNaN(releaseDate)) {
@@ -105,8 +138,12 @@ export const gameController = {
       const updatedGame = await gameService.updateGame(id, {
         name,
         developer,
+        genre,
+        description,
         releaseDate,
         price,
+        rating,
+        imageUrl,
       });
 
       return res.status(200).json(updatedGame);

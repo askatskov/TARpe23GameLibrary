@@ -108,51 +108,75 @@
       },
       "example": { "id": 1, "name": "Minecraft" }
     },
-    "Game": {
-      "type": "object",
-      "properties": {
-        "id": { "type": "integer", "format": "int32" },
-        "name": { "type": "string" },
-        "developer": { "type": "string" },
-        "releaseDate": { "type": "string", "format": "date-time" },
-        "price": { "type": "number", "format": "double" }
-      },
-      "example": {
-        "id": 1,
-        "name": "Minecraft",
-        "developer": "Mojang",
-        "releaseDate": "2011-11-18T00:00:00.000Z",
-        "price": 29.99
-      }
-    },
+"Game": {
+  "type": "object",
+  "properties": {
+    "id": { "type": "integer", "format": "int32" },
+    "name": { "type": "string" },
+    "developer": { "type": "string" },
+    "genre": { "type": "string" },
+    "description": { "type": "string" },
+    "releaseDate": { "type": "string", "format": "date-time" },
+    "price": { "type": "number", "format": "double" },
+    "rating": { "type": "number", "format": "double" },
+    "imageUrl": { "type": "string" }
+  },
+  "example": {
+    "id": 1,
+    "name": "Minecraft",
+    "developer": "Mojang",
+    "genre": "Sandbox",
+    "description": "Block-building sandbox game.",
+    "releaseDate": "2011-11-18T00:00:00.000Z",
+    "price": 29.99,
+    "rating": 9.5,
+    "imageUrl": "https://example.com/minecraft.jpg"
+  }
+},
+
     "Error": {
       "type": "object",
       "properties": { "error": { "type": "string" } },
       "example": { "error": "Error message" }
     },
     "NewGame": {
-      "type": "object",
-      "required": ["name"],
-      "properties": {
-        "name": { "type": "string", "description": "Required, unique" },
-        "developer": { "type": "string", "description": "Optional" },
-        "releaseDate": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Optional"
-        },
-        "price": {
-          "type": "number",
-          "format": "double",
-          "description": "Optional"
-        }
-      },
-      "example": {
-        "name": "Minecraft",
-        "developer": "Mojang",
-        "releaseDate": "2011-11-18T00:00:00.000Z",
-        "price": 29.99
-      }
+  "type": "object",
+  "required": ["name"],
+  "properties": {
+    "name": { "type": "string", "description": "Required, unique" },
+    "developer": { "type": "string", "description": "Optional" },
+    "genre": { "type": "string", "description": "Optional" },
+    "description": { "type": "string", "description": "Optional" },
+    "releaseDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional"
+    },
+    "price": {
+      "type": "number",
+      "format": "double",
+      "description": "Optional"
+    },
+    "rating": {
+      "type": "number",
+      "format": "double",
+      "description": "Optional"
+    },
+    "imageUrl": {
+      "type": "string",
+      "description": "Optional"
     }
+  },
+  "example": {
+    "name": "Minecraft",
+    "developer": "Mojang",
+    "genre": "Sandbox",
+    "description": "Block-building sandbox game.",
+    "releaseDate": "2011-11-18T00:00:00.000Z",
+    "price": 29.99,
+    "rating": 9.5,
+    "imageUrl": "https://example.com/minecraft.jpg"
+    }
+   }
   }
 }
