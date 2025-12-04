@@ -1,32 +1,34 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
 
-const isTest = process.env.NODE_ENV === 'test';
+dotenv.config();
+
+const isTest = process.env.NODE_ENV === "test";
 console.log("isTest:", isTest);
 
 const sequelize = isTest
-    ? new Sequelize({
-        dialect: "sqlite",
-        storage: ':memory',
-        logging: false
+  ? new Sequelize({
+      dialect: "sqlite",
+      storage: ":memory:",
+      logging: false,
     })
-    : new Sequelize({
-        dialect: 'sqlite',
-        storage: process.env.DB_FILE,
-        logging: false
+  : new Sequelize({
+      dialect: "sqlite",
+      storage: process.env.DB_FILE || "database.sqlite",
+      logging: false,
     });
 
-(async () => {
-    try {
-        await sequelize.authenticate();
-        console.log("Database connection has been established.");
-    } catch (error) {
-        console.log("Unable to connect to the database:", error);
-    }
-})();
+async function syncDatabase() {
+  try {
+    await sequelize.authenticate();
+    console.log("✅ Database connection has been established.");
 
-const sync = (async () => {
     await sequelize.sync({ alter: true });
-    console.log("All models were synchronized.");
-})
+    console.log("✅ All models were synchronized.");
+  } catch (error) {
+    console.error("❌ Unable to initialize the database:", error);
+    throw error;
+  }
+}
 
-export { sequelize, sync };
+export { sequelize, syncDatabase };

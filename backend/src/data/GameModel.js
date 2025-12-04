@@ -1,167 +1,134 @@
-// backend/src/data/GameModel.js
 import { sequelize } from "./dbConfig.js";
 import { DataTypes } from "sequelize";
-import dotenv from "dotenv";
 
-dotenv.config();
-
-export const GameModel = sequelize.define(
+const Game = sequelize.define(
   "Game",
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      primaryKey: true,
+      primaryKey: true
     },
+
+    rawgId: {
+      type: DataTypes.INTEGER,
+      allowNull: true  // manual create ei sisalda rawgId
+    },
+
+    slug: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
+      allowNull: false
     },
-    developer: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    genre: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
+
     description: {
       type: DataTypes.TEXT,
       allowNull: true,
+      defaultValue: ""
     },
-    releaseDate: {
-      type: DataTypes.DATE,
+
+    descriptionRaw: {
+      type: DataTypes.TEXT,
       allowNull: true,
+      defaultValue: ""
     },
-    price: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-    },
-    rating: {
-      type: DataTypes.DECIMAL(3, 1),
-      allowNull: true,
-    },
+
     imageUrl: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false
     },
-    priceHistory: {
+
+    backgroundImageAdditional: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+
+    website: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+
+    releaseDate: {
+      type: DataTypes.DATEONLY,
+      allowNull: true
+    },
+
+    rating: {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    },
+
+    ratingTop: {
+      type: DataTypes.FLOAT,
+      allowNull: true
+    },
+
+    ratingsCount: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+
+    playtime: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+
+    genres: {
       type: DataTypes.JSON,
       allowNull: true,
+      defaultValue: []
     },
-    reviews: {
+
+    platforms: {
       type: DataTypes.JSON,
       allowNull: true,
+      defaultValue: []
     },
+
+    tags: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      defaultValue: []
+    },
+
+    stores: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      defaultValue: []
+    },
+
+    esrbRating: {
+      type: DataTypes.JSON,
+      allowNull: true
+    },
+
+    screenshots: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      defaultValue: []
+    },
+
+    movies: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      defaultValue: []
+    },
+
+    rawgMeta: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      defaultValue: {}
+    }
   },
   {
     tableName: "Games",
-    timestamps: true,
+    timestamps: true
   }
 );
 
-if (process.env.DB_SYNC === "true") {
-  try {
-    await sequelize.sync({ alter: true });
-    console.log("✅ Database synchronized.");
-
-    if (process.env.DB_SEED === "true") {
-      const baseGames = [
-        {
-          name: "The Witcher 3: Wild Hunt",
-          developer: "CD Projekt Red",
-          genre: "Action RPG",
-          description:
-            "Avatud maailma fantaasia-RPG, kus mängid nõiduri Geraltina.",
-          releaseDate: "2015-05-19T00:00:00.000Z",
-          price: 29.99,
-          rating: 9.8,
-          imageUrl:
-            "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/292030/header.jpg",
-          priceHistory: [
-            { date: "2022-01-01", price: 39.99 },
-            { date: "2023-01-01", price: 29.99 },
-            { date: "2024-01-01", price: 19.99 },
-          ],
-          reviews: [
-            {
-              username: "Geralt",
-              rating: 10,
-              comment: "Best RPG ever made.",
-              createdAt: "2024-06-01T12:00:00.000Z",
-            },
-            {
-              username: "Yennefer",
-              rating: 9,
-              comment: "Story & world-building are insane.",
-              createdAt: "2024-07-10T09:30:00.000Z",
-            },
-          ],
-        },
-        {
-          name: "Cyberpunk 2077",
-          developer: "CD Projekt Red",
-          genre: "Action RPG",
-          description:
-            "Futuristlik avatud maailma RPG Night City tänavatel.",
-          releaseDate: "2020-12-10T00:00:00.000Z",
-          price: 59.99,
-          rating: 9.0,
-          imageUrl:
-            "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1091500/header.jpg",
-          priceHistory: [
-            { date: "2022-01-01", price: 59.99 },
-            { date: "2023-01-01", price: 49.99 },
-            { date: "2024-01-01", price: 39.99 },
-          ],
-          reviews: [
-            {
-              username: "V",
-              rating: 9,
-              comment: "After patches this is a beast.",
-              createdAt: "2024-02-02T14:20:00.000Z",
-            },
-          ],
-        },
-        {
-          name: "Elden Ring",
-          developer: "FromSoftware",
-          genre: "Soulslike RPG",
-          description: "Avatud maailma soulslike FromSoftware’ilt.",
-          releaseDate: "2022-02-25T00:00:00.000Z",
-          price: 59.99,
-          rating: 9.8,
-          imageUrl:
-            "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/header.jpg",
-          priceHistory: [
-            { date: "2022-03-01", price: 59.99 },
-            { date: "2023-03-01", price: 49.99 },
-            { date: "2024-03-01", price: 44.99 },
-          ],
-          reviews: [
-            {
-              username: "Tarnished",
-              rating: 10,
-              comment: "Pain, beauty, freedom.",
-              createdAt: "2024-03-15T18:45:00.000Z",
-            },
-          ],
-        },
-      ];
-
-      for (const game of baseGames) {
-        await GameModel.findOrCreate({
-          where: { name: game.name },
-          defaults: game,
-        });
-      }
-
-      console.log("🎮 Seeded base games with images, price history & reviews.");
-    }
-  } catch (err) {
-    console.error("❌ Error syncing/seeding GameModel:", err);
-  }
-}
-
-export default GameModel;
+export default Game;
+export { Game };
