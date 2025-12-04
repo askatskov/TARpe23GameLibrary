@@ -1,45 +1,38 @@
 import express from "express";
-import http from "http";
-import dotenv from "dotenv";
 import cors from "cors";
-import swaggerUi from "swagger-ui-express";
-import swaggerDoc from "./docs/swagger.json" with { type: "json" };
-import { syncDatabase } from "./data/dbConfig.js";
-import { seedGames } from "./data/GameModel.js";
-import { userService } from "./data/userService.js";
-import gameRoutes from "./routes/gameRoutes.js";
+import dotenv from "dotenv";
+import { sequelize } from "./data/dbConfig.js";
 
+import "./data/ListingModel.js";
+
+import rawgRoutes from "./routes/rawgRoutes.js";
+import listingRoutes from "./routes/listingRoutes.js";
+
+import swaggerUi from "swagger-ui-express";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
 const app = express();
-const httpServer = http.createServer(app);
 
 app.use(cors());
 app.use(express.json());
 
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-app.get("/", async (req, res) => {
-  const user = await userService.getUser("Tiit");
-  const name = user?.username || "guest";
-  res.status(200).type("text/plain").send(`Hello, ${name}!`);
-});
+const swaggerPath = path.join(__dirname, "docs/swagger.json");
+const swaggerDocument = JSON.parse(fs.readFileSync(swaggerPath, "utf8"));
 
-app.use("/api/v1/games", gameRoutes);
-
-app.use((req, res) => {
-  res.status(404).json({ error: "Not found" });
-});
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/api/v1/games", rawgRoutes);
+app.use("/api/v1/listings", listingRoutes);
 
 const PORT = process.env.PORT || 8000;
 
-httpServer.listen(PORT, async () => {
-  await syncDatabase();
-  await seedGames();
-  await userService.createUser("Tiit", "pass");
-
-  console.log(`✅ Server is running at http://localhost:${PORT}/`);
+sequelize.sync().then(() => {
+  console.log("DB synced");
+  app.listen(PORT, () => console.log("Server running on port", PORT));
 });
-
-export { httpServer, app };

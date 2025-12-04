@@ -3,7 +3,7 @@
   "info": {
     "title": "Game Marketplace API",
     "version": "1.0.0",
-    "description": "API for listing, reviewing and managing RAWG-powered games."
+    "description": "RAWG-based game marketplace for Buy/Sell of keys/accounts."
   },
   "servers": [
     {
@@ -11,76 +11,33 @@
     }
   ],
   "paths": {
-    "/games": {
+    "/games/search": {
       "get": {
-        "summary": "Get all games",
         "tags": ["Games"],
+        "summary": "Search games from RAWG",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Search query (game name)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": { "type": "integer", "default": 20 }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "List of games",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/Game" }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Create game",
-        "tags": ["Games"],
-        "description": "Create a game manually using RAWG-compatible structure",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/GameCreate" }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Game created",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Game" }
-              }
-            }
-          }
-        }
-      }
-    },
-
-    "/games/featured": {
-      "get": {
-        "summary": "Get featured games",
-        "tags": ["Games"],
-        "responses": {
-          "200": {
-            "description": "Featured list",
-            "content": {
-              "application/json": {
-                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Game" } }
-              }
-            }
-          }
-        }
-      }
-    },
-
-    "/games/genres": {
-      "get": {
-        "summary": "Get games grouped by genres",
-        "tags": ["Games"],
-        "responses": {
-          "200": {
-            "description": "Grouped games response",
-            "content": {
-              "application/json": {}
-            }
+            "description": "RAWG search result",
+            "content": { "application/json": {} }
           }
         }
       }
@@ -88,102 +45,164 @@
 
     "/games/{id}": {
       "get": {
-        "summary": "Get a game",
         "tags": ["Games"],
+        "summary": "Get game details from RAWG",
         "parameters": [
-          { "$ref": "#/components/parameters/GameId" }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "RAWG game ID or slug"
+          }
         ],
         "responses": {
           "200": {
-            "description": "Game found",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Game" } } }
-          },
-          "404": { "description": "Game not found" }
-        }
-      },
-      "put": {
-        "summary": "Update a game with RAWG-compatible values",
-        "tags": ["Games"],
-        "parameters": [
-          { "$ref": "#/components/parameters/GameId" }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/GameUpdate" } }
+            "description": "Game details",
+            "content": { "application/json": {} }
           }
-        },
-        "responses": {
-          "200": { "description": "Game updated" },
-          "404": { "description": "Game not found" }
-        }
-      },
-      "delete": {
-        "summary": "Delete a game",
-        "tags": ["Games"],
-        "parameters": [
-          { "$ref": "#/components/parameters/GameId" }
-        ],
-        "responses": {
-          "204": { "description": "Deleted" },
-          "404": { "description": "Game not found" }
         }
       }
     },
 
-    "/games/{id}/similar": {
+    "/listings": {
       "get": {
-        "summary": "Get similar games",
-        "tags": ["Games"],
+        "tags": ["Listings"],
+        "summary": "Get listings (filterable)",
         "parameters": [
-          { "$ref": "#/components/parameters/GameId" }
+          {
+            "name": "type",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["BUY", "SELL"] }
+          },
+          {
+            "name": "itemType",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["KEY", "ACCOUNT"] }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["ACTIVE", "SOLD", "EXPIRED", "CANCELLED"]
+            }
+          },
+          {
+            "name": "gameRawgId",
+            "in": "query",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "platform",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "minPrice",
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "schema": { "type": "number" }
+          }
         ],
         "responses": {
-          "200": { "description": "Similar games" }
-        }
-      }
-    },
-
-    "/games/{id}/price-history": {
-      "get": {
-        "summary": "Get price history",
-        "tags": ["Games"],
-        "parameters": [
-          { "$ref": "#/components/parameters/GameId" }
-        ],
-        "responses": {
-          "200": { "description": "Price history entries" }
-        }
-      }
-    },
-
-    "/games/{id}/reviews": {
-      "get": {
-        "summary": "Get reviews",
-        "tags": ["Games"],
-        "parameters": [
-          { "$ref": "#/components/parameters/GameId" }
-        ],
-        "responses": {
-          "200": { "description": "List of reviews" }
+          "200": {
+            "description": "List of listings",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Listing" } }
+              }
+            }
+          }
         }
       },
       "post": {
-        "summary": "Create a review",
-        "tags": ["Games"],
+        "tags": ["Listings"],
+        "summary": "Create listing (Buy or Sell)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ListingCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Listing created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Listing" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/listings/{id}": {
+      "get": {
+        "tags": ["Listings"],
+        "summary": "Get listing by id",
         "parameters": [
-          { "$ref": "#/components/parameters/GameId" }
+          { "$ref": "#/components/parameters/ListingId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Listing",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Listing" }
+              }
+            }
+          },
+          "404": { "description": "Listing not found" }
+        }
+      },
+      "put": {
+        "tags": ["Listings"],
+        "summary": "Update listing",
+        "parameters": [
+          { "$ref": "#/components/parameters/ListingId" }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/ReviewCreate" }
+              "schema": { "$ref": "#/components/schemas/ListingUpdate" }
             }
           }
         },
         "responses": {
-          "201": { "description": "Review created" }
+          "200": {
+            "description": "Listing updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Listing" }
+              }
+            }
+          },
+          "404": { "description": "Listing not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Listings"],
+        "summary": "Delete listing",
+        "parameters": [
+          { "$ref": "#/components/parameters/ListingId" }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "description": "Listing not found" }
         }
       }
     }
@@ -191,80 +210,68 @@
 
   "components": {
     "parameters": {
-      "GameId": {
+      "ListingId": {
         "name": "id",
         "in": "path",
         "required": true,
         "schema": { "type": "integer" }
       }
     },
-
     "schemas": {
-      "GameCreate": {
-        "type": "object",
-        "required": ["name", "imageUrl"],
-        "properties": {
-          "name": { "type": "string" },
-          "imageUrl": { "type": "string" },
-          "releaseDate": { "type": "string", "format": "date" },
-          "description": { "type": "string" },
-          "genres": { "type": "array", "items": { "type": "string" } },
-          "platforms": { "type": "array", "items": { "type": "string" } },
-          "tags": { "type": "array", "items": { "type": "string" } },
-          "stores": { "type": "array", "items": { "type": "string" } },
-          "rating": { "type": "number" },
-          "ratingTop": { "type": "number" },
-          "ratingsCount": { "type": "integer" },
-          "playtime": { "type": "integer" }
-        }
-      },
-
-      "GameUpdate": {
-        "type": "object",
-        "properties": {
-          "name": { "type": "string" },
-          "imageUrl": { "type": "string" },
-          "releaseDate": { "type": "string", "format": "date" },
-          "description": { "type": "string" },
-          "genres": { "type": "array", "items": { "type": "string" } },
-          "platforms": { "type": "array", "items": { "type": "string" } },
-          "tags": { "type": "array", "items": { "type": "string" } },
-          "stores": { "type": "array", "items": { "type": "string" } },
-          "rating": { "type": "number" },
-          "ratingTop": { "type": "number" },
-          "ratingsCount": { "type": "integer" },
-          "playtime": { "type": "integer" }
-        }
-      },
-
-      "Game": {
+      "Listing": {
         "type": "object",
         "properties": {
           "id": { "type": "integer" },
-          "rawgId": { "type": "integer" },
-          "slug": { "type": "string" },
-          "name": { "type": "string" },
+          "gameRawgId": { "type": "integer" },
+          "gameSlug": { "type": "string" },
+          "gameName": { "type": "string" },
+          "type": { "type": "string", "enum": ["BUY", "SELL"] },
+          "itemType": { "type": "string", "enum": ["KEY", "ACCOUNT"] },
+          "platform": { "type": "string" },
+          "price": { "type": "number" },
+          "currency": { "type": "string" },
           "description": { "type": "string" },
-          "imageUrl": { "type": "string" },
-          "releaseDate": { "type": "string", "format": "date" },
-          "genres": { "type": "array", "items": { "type": "string" } },
-          "platforms": { "type": "array", "items": { "type": "string" } },
-          "tags": { "type": "array", "items": { "type": "string" } },
-          "stores": { "type": "array", "items": { "type": "string" } },
-          "rating": { "type": "number" },
-          "ratingTop": { "type": "number" },
-          "ratingsCount": { "type": "integer" },
-          "playtime": { "type": "integer" }
+          "userId": { "type": "integer" },
+          "status": {
+            "type": "string",
+            "enum": ["ACTIVE", "SOLD", "EXPIRED", "CANCELLED"]
+          },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
         }
       },
-
-      "ReviewCreate": {
+      "ListingCreate": {
         "type": "object",
-        "required": ["userName", "rating", "review"],
+        "required": ["gameRawgId", "gameName", "type", "itemType", "price"],
         "properties": {
-          "userName": { "type": "string" },
-          "rating": { "type": "integer" },
-          "review": { "type": "string" }
+          "gameRawgId": { "type": "integer" },
+          "gameSlug": { "type": "string" },
+          "gameName": { "type": "string" },
+          "type": { "type": "string", "enum": ["BUY", "SELL"] },
+          "itemType": { "type": "string", "enum": ["KEY", "ACCOUNT"] },
+          "platform": { "type": "string" },
+          "price": { "type": "number" },
+          "currency": { "type": "string", "default": "EUR" },
+          "description": { "type": "string" },
+          "userId": { "type": "integer" }
+        }
+      },
+      "ListingUpdate": {
+        "type": "object",
+        "properties": {
+          "gameSlug": { "type": "string" },
+          "gameName": { "type": "string" },
+          "type": { "type": "string", "enum": ["BUY", "SELL"] },
+          "itemType": { "type": "string", "enum": ["KEY", "ACCOUNT"] },
+          "platform": { "type": "string" },
+          "price": { "type": "number" },
+          "currency": { "type": "string" },
+          "description": { "type": "string" },
+          "userId": { "type": "integer" },
+          "status": {
+            "type": "string",
+            "enum": ["ACTIVE", "SOLD", "EXPIRED", "CANCELLED"]
+          }
         }
       }
     }
