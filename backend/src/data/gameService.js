@@ -1,4 +1,4 @@
-import Game from "./GameModel.js";
+/*import Game from "./GameModel.js";
 
 async function getGameById(id) {
   const game = await Game.findByPk(id);
@@ -141,3 +141,4 @@ export const gameService = {
   getGamesByGenres,
   getSimilarGames,
 };
+*/

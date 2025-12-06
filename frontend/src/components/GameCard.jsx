@@ -2,22 +2,29 @@ import { Link } from "react-router-dom";
 
 export default function GameCard({ game }) {
   return (
-    <div style={{
-      border: "1px solid #ddd",
-      padding: 10,
-      borderRadius: 8,
-      margin: 10,
-      width: 220
-    }}>
-      <img
-        src={game.background_image}
-        alt={game.name}
-        style={{ width: "100%", borderRadius: 8 }}
-      />
-      <h4>{game.name}</h4>
-      <p>⭐ {game.rating}</p>
-
-      <Link to={`/game/${game.id}`}>View</Link>
+    <div className="game-card">
+      {game.background_image && (
+        <img
+          src={game.background_image}
+          alt={game.name}
+          className="game-card-img"
+        />
+      )}
+      <div className="game-card-body">
+        <div className="game-card-title">{game.name}</div>
+        <div className="game-card-meta">
+          {game.released && <span>{game.released}</span>}
+          {game.rating != null && <span>⭐ {game.rating}</span>}
+        </div>
+        {Array.isArray(game.genres) && game.genres.length > 0 && (
+          <div className="game-card-genres">
+            {game.genres.map((g) => g.name || g).join(", ")}
+          </div>
+        )}
+        <Link to={`/game/${game.id}`} className="game-card-link">
+          View details
+        </Link>
+      </div>
     </div>
   );
 }

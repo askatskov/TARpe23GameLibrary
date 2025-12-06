@@ -1,4 +1,4 @@
-import { gameService } from "../data/gameService.js";
+/*import { gameService } from "../data/gameService.js";
 
 function parseId(req, res) {
   const id = Number(req.params.id);
@@ -241,3 +241,4 @@ export const gameController = {
   deleteGame,
   getSimilarGames,
 };
+*/

@@ -1,20 +1,32 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Link, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Game from "./pages/Game";
-import Sell from "./pages/Sell";
+import GameDetail from "./pages/GameDetail";
+import NewListing from "./pages/NewListing";
 
 export default function App() {
   return (
-    <div style={{ fontFamily: "Arial", padding: 20 }}>
-      <nav style={{ marginBottom: 20 }}>
-        <Link to="/">Home</Link>
-      </nav>
+    <div className="app-root">
+      <header className="app-header">
+        <div>
+          <h1>Game Marketplace (RAWG + Keys/Accounts)</h1>
+          <p>
+            RAWG API tõmbab mängude info.
+          </p>
+        </div>
+        <nav>
+          <Link to="/" className="nav-link">
+            Home
+          </Link>
+        </nav>
+      </header>
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/game/:id" element={<Game />} />
-        <Route path="/sell/:rawgId" element={<Sell />} />
-      </Routes>
+      <main className="app-main">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/game/:id" element={<GameDetail />} />
+          <Route path="/game/:id/sell" element={<NewListing />} />
+        </Routes>
+      </main>
     </div>
   );
 }

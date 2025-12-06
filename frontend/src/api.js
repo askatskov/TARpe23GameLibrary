@@ -1,29 +1,39 @@
-const API = "http://localhost:8000/api/v1";
+const API_BASE = "http://localhost:8000/api/v1";
 
-// RAWG search
+export async function fetchTopGames() {
+  const res = await fetch(`${API_BASE}/games`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
 export async function searchGames(q) {
-  const res = await fetch(`${API}/games/search?q=${encodeURIComponent(q)}`);
+  const res = await fetch(
+    `${API_BASE}/games/search?q=${encodeURIComponent(q)}`
+  );
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
-// RAWG details
-export async function getGameDetails(id) {
-  const res = await fetch(`${API}/games/${id}`);
+export async function fetchGameDetails(id) {
+  const res = await fetch(`${API_BASE}/games/${id}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
-// Marketplace listings
-export async function getListings(gameRawgId) {
-  const res = await fetch(`${API}/listings?gameRawgId=${gameRawgId}`);
+export async function fetchListingsByGame(gameRawgId) {
+  const res = await fetch(
+    `${API_BASE}/listings?gameRawgId=${encodeURIComponent(gameRawgId)}`
+  );
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
-// Create listing
-export async function createListing(data) {
-  const res = await fetch(`${API}/listings`, {
+export async function createListing(payload) {
+  const res = await fetch(`${API_BASE}/listings`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }

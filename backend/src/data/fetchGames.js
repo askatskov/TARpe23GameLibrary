@@ -1,4 +1,4 @@
-const RAWG_BASE = "https://api.rawg.io/api";
+/*const RAWG_BASE = "https://api.rawg.io/api";
 
 function buildUrl(path, params = {}) {
   const url = new URL(RAWG_BASE + path);
@@ -120,3 +120,4 @@ export async function fetchFullGames(total = 50) {
 
   return fullGames;
 }
+*/

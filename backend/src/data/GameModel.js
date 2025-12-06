@@ -1,4 +1,4 @@
-import { sequelize } from "./dbConfig.js";
+/*import { sequelize } from "./dbConfig.js";
 import { DataTypes } from "sequelize";
 
 const Game = sequelize.define(
@@ -132,3 +132,4 @@ const Game = sequelize.define(
 
 export default Game;
 export { Game };
+*/

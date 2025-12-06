@@ -1,4 +1,4 @@
-import { Router } from "express";
+/*import { Router } from "express";
 import { gameController } from "../controllers/gameController.js";
 
 const router = Router();
@@ -14,3 +14,4 @@ router.put("/:id", gameController.updateGame);
 router.delete("/:id", gameController.deleteGame);
 
 export default router;
+*/
