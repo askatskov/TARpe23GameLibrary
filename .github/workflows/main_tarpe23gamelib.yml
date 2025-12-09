@@ -1,4 +1,7 @@
-name: Fullstack Deploy to Azure Web App
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy Node.js app to Azure Web App - TARpe23GameLib
 
 on:
   push:
@@ -9,75 +12,38 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read #This is required for actions/checkout
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
 
-      # --- FRONTEND BUILD ---
-      - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm install
-
-      - name: Build frontend
-        run: |
-          cd frontend
-          npm run build
-
-      # --- COPY FRONTEND BUILD TO BACKEND ---
-      - name: Copy frontend build to backend
-        run: |
-          rm -rf backend/public
-          mkdir -p backend/public
-          cp -r frontend/dist/* backend/public/
-
-      # --- BACKEND INSTALL ---
-      - name: Install backend dependencies
-        run: |
-          cd backend
-          npm install --production
-
-      # --- PACKAGE BACKEND FOR DEPLOYMENT ---
-      - name: Prepare deployment ZIP
-        run: |
-          cd backend
-          zip -r ../deploy.zip .
-
-      - name: Upload artifact
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: deploy.zip
-          path: deploy.zip
+          name: node-app
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-
+    
     steps:
-      - name: Download artifact
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: deploy.zip
-
-      - name: Unzip deployment package
-        run: unzip deploy.zip -d deploy
-
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_1B48ADCAD4FB40818B98A35AFA7541A6 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_89C2956D0C3841909B349EB0B405C8E6 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_12D316F10A2043BBBB81A54C863691E9 }}
-
-      - name: Deploy to Azure Web App
+          name: node-app
+      
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'TARpe23GameLib'
           slot-name: 'Production'
-          package: deploy
+          package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_80FD5C4B949842F4BC46F78A4177EB38 }}
