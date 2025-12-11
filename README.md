@@ -18,7 +18,7 @@ Mine kausta backend ja nimeta ümber `.env.example` -> `.env`
 
 Täida `.env` fail sobivate andmetega
 
-Peale kloonimist minna kloonitud kausta ja käivitada käsk: `npm install` Projekti käivitamiseks anda käsk: `npm start`
+Peale kloonimist minna kloonitud kausta ja käivitada käsk: `npm install` Projekti käivitamiseks anda käsk: `npm run dev`
 
 Projekt töötab ja kuvab veebilehed, millelt saab lehte külastada.
 Lõpetamiseks vajuta klahve CTRL+C
